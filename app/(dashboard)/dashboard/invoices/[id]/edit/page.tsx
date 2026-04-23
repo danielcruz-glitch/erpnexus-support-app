@@ -6,18 +6,22 @@ import { Button } from "@/components/ui/button";
 import type { InvoiceRow } from "@/lib/types";
 
 type EditInvoicePageProps = {
-  params: {
+  params: Promise<{
     id: string;
-  };
+  }>;
 };
 
-export default async function EditInvoicePage({ params }: EditInvoicePageProps) {
+export default async function EditInvoicePage({
+  params,
+}: EditInvoicePageProps) {
+  const { id } = await params;
+
   const supabase = createAdminClient();
 
   const { data, error } = await supabase
     .from("invoices")
     .select("*")
-    .eq("id", params.id)
+    .eq("id", id)
     .single();
 
   if (error) {
@@ -37,22 +41,31 @@ export default async function EditInvoicePage({ params }: EditInvoicePageProps) 
         <form className="grid gap-5">
           <div className="grid gap-5 md:grid-cols-2">
             <div>
-              <label className="mb-2 block text-sm text-slate-300">Invoice number</label>
-              <Input defaultValue={invoice.invoice_number} />
+              <label className="mb-2 block text-sm text-slate-300">
+                Invoice number
+              </label>
+              <Input defaultValue={String(invoice.invoice_number ?? "")} />
             </div>
+
             <div>
-              <label className="mb-2 block text-sm text-slate-300">Status</label>
-              <Input defaultValue={invoice.status} />
+              <label className="mb-2 block text-sm text-slate-300">
+                Status
+              </label>
+              <Input defaultValue={invoice.status ?? ""} />
             </div>
           </div>
 
           <div>
-            <label className="mb-2 block text-sm text-slate-300">Payment terms label</label>
+            <label className="mb-2 block text-sm text-slate-300">
+              Payment terms label
+            </label>
             <Input defaultValue={invoice.payment_terms_label ?? "Net 30"} />
           </div>
 
           <div>
-            <label className="mb-2 block text-sm text-slate-300">Invoice notes</label>
+            <label className="mb-2 block text-sm text-slate-300">
+              Invoice notes
+            </label>
             <Textarea defaultValue={invoice.notes ?? ""} />
           </div>
 
